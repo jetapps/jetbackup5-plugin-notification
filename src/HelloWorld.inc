@@ -11,6 +11,7 @@
 namespace JetBackup\Core\Notification\HelloWorld;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use JetBackup\Core\Data\ArrayData;
 use JetBackup\Core\Exception\ConnectionException;
 use JetBackup\Core\Exception\NotificationException;
@@ -41,19 +42,23 @@ class HelloWorld implements Notification {
 	 */
 	public function send($level, $subject, $message, $attachments=[]) {
 
-		$client = new Client();
-		$response = $client->request("POST", 'https://your-plugin-url.com', [
-			'form_params'   => [
-				'myfield'       => $this->getMyField(),
-				'action'        => 'sendMessage',
-				'level'         => $level,
-				'subject'       => $subject,
-				'message'       => $message,
-			],
-			'headers'       => [
-				'Content-type: application/json',
-			],
-		]);
+		try {
+			$client = new Client();
+			$response = $client->request("POST", 'https://your-plugin-url.com', [
+				'form_params'   => [
+					'myfield'       => $this->getMyField(),
+					'action'        => 'sendMessage',
+					'level'         => $level,
+					'subject'       => $subject,
+					'message'       => $message,
+				],
+				'headers'       => [
+					'Content-type: application/json',
+				],
+			]);
+		} catch(GuzzleException $e) {
+			throw new NotificationException($e->getMessage());
+		}
 
 		if($response->getStatusCode() != 200) throw new NotificationException("API returned invalid status code ({$response->getStatusCode()})");
 	}
@@ -108,16 +113,20 @@ class HelloWorld implements Notification {
 	 */
 	public function testConnection() {
 
-		$client = new Client();
-		$response = $client->request("POST", 'https://your-plugin-url.com', [
-			'form_params'   => [
-				'myfield'       => $this->getMyField(),
-				'action'        => 'testConnection'
-			],
-			'headers'       => [ 
-				'Content-type: application/json', 
-			],
-		]);
+		try {
+			$client = new Client();
+			$response = $client->request("POST", 'https://your-plugin-url.com', [
+				'form_params'   => [
+					'myfield'       => $this->getMyField(),
+					'action'        => 'testConnection'
+				],
+				'headers'       => [
+					'Content-type: application/json',
+				],
+			]);
+		} catch(GuzzleException $e) {
+			throw new ConnectionException($e->getMessage());
+		}
 
 		if($response->getStatusCode() != 200) throw new ConnectionException("API returned invalid status code ({$response->getStatusCode()})");
 
