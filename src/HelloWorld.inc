@@ -84,7 +84,7 @@ class HelloWorld implements Notification {
 	}
 
 	/**
-	 * Stringify the data - JB will save the data for you 
+	 * UnStringify the data and use it in the plugin 
 	 * 
 	 * @param string $data
 	 */
@@ -93,7 +93,7 @@ class HelloWorld implements Notification {
 	}
 
 	/**
-	 * UnStringify the data
+	 * Stringify the data - JB will save the data for you
 	 * 
 	 * @return string
 	 */
